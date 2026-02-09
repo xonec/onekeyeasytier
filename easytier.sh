@@ -39,13 +39,18 @@ check_arch() {
 download_easytier() {
     green "开始下载easytier二进制文件..."
     local ARCH=$(check_arch)
+    # 适配原版的下载源（优先官方最新版）
     local DOWNLOAD_URL="https://github.com/EasyTier/EasyTier/releases/${ET_VERSION}/download/easytier-linux-${ARCH}"
-
+    
     if ! wget -q -O ${ET_BIN} ${DOWNLOAD_URL}; then
-        red "下载失败！请检查网络或版本是否存在。"
-        exit 1
+        red "下载失败！尝试备用源..."
+        DOWNLOAD_URL="https://ghproxy.com/${DOWNLOAD_URL}"
+        if ! wget -q -O ${ET_BIN} ${DOWNLOAD_URL}; then
+            red "备用源也下载失败！请检查网络或手动安装。"
+            exit 1
+        fi
     fi
-
+    
     chmod +x ${ET_BIN}
     green "下载完成：${ET_BIN}"
 }
@@ -60,14 +65,16 @@ start_easytier() {
 
     # 核心修改点：添加 --private 参数，默认开启私有模式
     nohup ${ET_BIN} server --private --port ${ET_PORT} --password ${ET_PASS} > ${ET_LOG} 2>&1 &
-
+    
     # 等待进程启动
     sleep 2
     if pgrep -f "easytier server" > /dev/null; then
+        green "========================================"
         green "easytier服务启动成功（私有模式已开启）！"
         green "端口：${ET_PORT}"
         green "密码：${ET_PASS}"
         green "日志：${ET_LOG}"
+        green "========================================"
     else
         red "easytier服务启动失败！请查看日志：${ET_LOG}"
         exit 1
@@ -103,6 +110,7 @@ status_easytier() {
         green "easytier服务正在运行！"
         green "进程信息："
         ps aux | grep "easytier server" | grep -v grep
+        green "私有模式验证：进程参数包含 --private 即为开启"
     else
         red "easytier服务未运行！"
     fi
@@ -122,13 +130,15 @@ ExecStart=${ET_BIN} server --private --port ${ET_PORT} --password ${ET_PASS}
 ExecStop=pkill -f "easytier server"
 Restart=always
 RestartSec=5
+StandardOutput=append:${ET_LOG}
+StandardError=append:${ET_LOG}
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
     systemctl daemon-reload
-    systemctl enable easytier
+    systemctl enable easytier > /dev/null 2>&1
     green "开机自启已配置完成！"
 }
 
@@ -137,12 +147,21 @@ uninstall_easytier() {
     stop_easytier
     rm -rf ${ET_BIN} ${ET_LOG} ${ET_SERVICE}
     systemctl daemon-reload
+    systemctl disable easytier > /dev/null 2>&1
     green "easytier已完全卸载！"
 }
 
-# 主菜单
+# 主菜单（恢复原版：无参数默认执行install）
 main() {
     check_root
+    # 核心修正：无参数时默认执行install
+    if [ $# -eq 0 ]; then
+        download_easytier
+        start_easytier
+        enable_easytier
+        return 0
+    fi
+    
     case $1 in
         install)
             download_easytier
@@ -167,7 +186,7 @@ main() {
         *)
             echo "用法：$0 [install|start|stop|restart|status|uninstall]"
             echo "示例："
-            echo "  安装并启动：$0 install"
+            echo "  安装并启动：$0 install（或直接执行 $0）"
             echo "  启动服务：$0 start"
             echo "  停止服务：$0 stop"
             echo "  重启服务：$0 restart"
