@@ -3,6 +3,12 @@
 一键组网，天下无敌。上面有windows版本，复制了在powershell运行就可以
 
 ![ec9mmBQAWMdMVdkePVvogUYIT4YlodQo.png](https://cdn.nodeimage.com/i/ec9mmBQAWMdMVdkePVvogUYIT4YlodQo.png)
+
+
+
+# 新增：默认开启私有模式（仅允许相同network_name/network_secret的节点连接）
+
+
 ```
 bash <(curl -sL https://raw.githubusercontent.com/xonec/onekeyeasytier/refs/heads/main/easytier.sh)
 ```
