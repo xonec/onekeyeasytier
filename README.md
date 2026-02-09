@@ -4,7 +4,7 @@
 
 ![ec9mmBQAWMdMVdkePVvogUYIT4YlodQo.png](https://cdn.nodeimage.com/i/ec9mmBQAWMdMVdkePVvogUYIT4YlodQo.png)
 ```
-bash <(curl -sL https://raw.githubusercontent.com/ceocok/c.cococ/refs/heads/main/easytier.sh)
+bash <(curl -sL https://raw.githubusercontent.com/xonec/onekeyeasytier/refs/heads/main/easytier.sh)
 ```
 - ✨ 这个脚本凭什么被称为“宇宙无敌好用”？
 - 🖥️ 全平台制霸
