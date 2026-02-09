@@ -6,6 +6,13 @@
 ```
 bash <(curl -sL https://raw.githubusercontent.com/xonec/onekeyeasytier/refs/heads/main/easytier.sh)
 ```
+
+
+```
+bash <(curl -sL https://raw.kkgithub.com/xonec/onekeyeasytier/main/easytier.sh)
+```
+
+
 - ✨ 这个脚本凭什么被称为“宇宙无敌好用”？
 - 🖥️ 全平台制霸
 - 完美适配主流系统，并为每个系统提供了最佳实践：
